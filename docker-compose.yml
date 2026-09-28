@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/app
+
+  postgres:
+    image: postgres:18.6-trixie
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql
+
+volumes:
+  pgdata:
