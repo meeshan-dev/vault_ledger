@@ -1,44 +1,4 @@
 -- migrate:up
-CREATE TYPE transaction_type_enum AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'FEE');
-
-CREATE TABLE accounts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id UUID NOT NULL,
-    owner_name TEXT NOT NULL,
-    balance NUMERIC(13, 2) NOT NULL DEFAULT 0.00,
-    is_active BOOLEAN NOT NULL DEFAULT true
-);
-
-CREATE TABLE transactions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    account_id UUID NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-    amount NUMERIC(13, 2) NOT NULL,
-    transaction_type transaction_type_enum NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY tenant_isolation_accounts
-ON accounts
-FOR ALL
-USING (tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid)
-WITH CHECK (tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);
-
-CREATE POLICY tenant_isolation_transactions
-ON transactions
-FOR ALL
-USING (
-    account_id IN (
-        SELECT id
-        FROM accounts
-        WHERE tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid
-    )
-);
-
-CREATE INDEX transactions_account_id_created_at ON transactions(account_id, created_at DESC);
-CREATE INDEX accounts_id ON accounts (id) WHERE is_active = true;
 
 CREATE OR REPLACE FUNCTION withdrawal_validation()
 RETURNS TRIGGER AS $$
@@ -106,4 +66,6 @@ AFTER INSERT ON transactions
 FOR EACH ROW
 EXECUTE FUNCTION modify_balance();
 
+
 -- migrate:down
+
