@@ -69,3 +69,7 @@ EXECUTE FUNCTION modify_balance();
 
 -- migrate:down
 
+DROP FUNCTION IF EXISTS withdrawal_validation;
+DROP TRIGGER IF EXISTS trg_withdrawal_validation;
+DROP FUNCTION IF EXISTS modify_balance;
+DROP TRIGGER IF EXISTS trg_modify_balance;

@@ -5,3 +5,5 @@ CREATE INDEX accounts_id ON accounts (id) WHERE is_active = true;
 
 -- migrate:down
 
+DROP INDEX IF EXISTS transactions_account_id_created_at;
+DROP INDEX IF EXISTS accounts_id;

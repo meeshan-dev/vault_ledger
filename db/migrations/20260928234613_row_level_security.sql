@@ -22,3 +22,5 @@ USING (
 
 -- migrate:down
 
+DROP POLICY IF EXISTS tenant_isolation_accounts;
+DROP POLICY IF EXISTS tenant_isolation_transactions;

@@ -19,3 +19,6 @@ CREATE TABLE transactions (
 );
 
 -- migrate:down
+
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS accounts;
